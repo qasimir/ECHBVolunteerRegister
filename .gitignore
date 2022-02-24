@@ -1,0 +1,4 @@
+.idea/
+Model/__pycache__/
+View/__pycache__/
+Controller/__pycache__/

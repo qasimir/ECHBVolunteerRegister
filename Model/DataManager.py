@@ -1,13 +1,20 @@
 import os
-from datetime import date
+
 from Model.VolunteerInfoManager import VolunteerInfoManager
 from Model.VolunteerSessionManager import VolunteerSessionManager
 from Controller.SecurityManager import SecurityManager as sm
+from Model.ServerManager import ServerManager as svm
 
 
 class DataManager:
 
-    records_folder = os.getcwd() + "\\" #"C:\\Records\\"
+    file_separator = os.path.sep
+    records_folder = os.getcwd() + file_separator + "records" + file_separator #"C:\\Records\\"
+
+
+    if not os.path.isdir(records_folder):
+        print("made volunteer records file")
+        os.mkdir(records_folder)
     volunteer_info_file_string = "volunteerList.txt"
     volunteer_session_file_string = "volunteerHours"
     config_file_string = "config.txt"
@@ -15,8 +22,6 @@ class DataManager:
 
     volunteer_info_manager = VolunteerInfoManager(records_folder, volunteer_info_file_string, volunteers)
     volunteer_session_manager = VolunteerSessionManager(records_folder, volunteer_session_file_string)
-
-
 
     @staticmethod
     def save_volunteer(volunteer, key):
@@ -82,10 +87,12 @@ class DataManager:
     @staticmethod
     def sign_in_volunteer(volunteer):
         DataManager.volunteer_session_manager.sign_in_volunteer(volunteer)
+        svm.POST_file(DataManager.records_folder, DataManager.volunteer_session_file_string)
 
     @staticmethod
     def sign_out_volunteer(volunteer):
         DataManager.volunteer_session_manager.sign_out_volunteer(volunteer)
+        svm.POST_file(DataManager.records_folder, DataManager.volunteer_session_file_string)
 
     @staticmethod
     def update_sign_in_status():
@@ -101,6 +108,13 @@ class DataManager:
     def delete_volunteer(volunteer, key):
         DataManager.volunteers.remove(volunteer)
         DataManager.save_and_encrypt_volunteer_info(key)
+
+    @staticmethod
+    def set_connection_param(param, value):
+            if param == "Domain":
+                svm.server_domain = value
+            elif param == "Port":
+                svm.server_port = value
 
     def check_admin_password(self,attempt):
         return sm.hashed_input

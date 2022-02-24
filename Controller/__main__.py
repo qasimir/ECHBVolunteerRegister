@@ -1,3 +1,4 @@
+import sys
 from tkinter import *
 from Model.DataManager import DataManager as dm
 from Controller.SecurityManager import SecurityManager as sm
@@ -8,16 +9,25 @@ from View.VolunteerSignOut import VolunteerSignOut
 
 class mainWindow:
 
-    title = "Environment Centre Hawkes Bay Volunteer Register"
+    title = "Environment Centre Hawke's Bay Volunteer Register"
 
     def __init__(self):
+
+        if sys.argv[1] is not None:
+            dm.set_connection_param("Domain",sys.argv[1])
+        else:
+            print("No server name specified. Saving locally")
+        if sys.argv[2] is not None:
+            dm.set_connection_param("Port",sys.argv[2])
+        else:
+            print("No port number specified.")
 
         #First, load the encryption config files
         dm.load_config()
 
         #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # REMOVE THIS AFTER TESTING
-        #dm.open_and_decrypt_volunteer_info(sm.get_key_from_password())
+        dm.open_and_decrypt_volunteer_info(sm.get_key_from_password())
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         dm.load_volunteer_sessions_file()
